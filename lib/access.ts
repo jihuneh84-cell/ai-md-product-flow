@@ -4,6 +4,14 @@ export const PRODUCT_FLOW_ACCESS_MESSAGE = '상품개발 플로우는 현재 지
 
 export const normalizeEmail = (email?: string | null) => (email || '').trim().toLowerCase()
 
-export const canUseProductFlow = (email?: string | null) => {
-  return PRODUCT_FLOW_ALLOWED_EMAILS.includes(normalizeEmail(email))
+type ProductFlowProfile = {
+  role?: string | null
+  is_approved?: boolean | null
+}
+
+export const canUseProductFlow = (email?: string | null, profile?: ProductFlowProfile | null) => {
+  return (
+    PRODUCT_FLOW_ALLOWED_EMAILS.includes(normalizeEmail(email)) ||
+    Boolean(profile?.is_approved && profile.role === 'admin')
+  )
 }

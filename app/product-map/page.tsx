@@ -443,7 +443,18 @@ export default function ProductMapPage() {
       data: { user },
     } = await supabase.auth.getUser()
 
-    if (!canUseProductFlow(user?.email)) {
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role, is_approved')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    if (!canUseProductFlow(user.email, profile)) {
       await supabase.auth.signOut()
       alert(PRODUCT_FLOW_ACCESS_MESSAGE)
       router.push('/login')

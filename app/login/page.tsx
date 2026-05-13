@@ -20,13 +20,31 @@ export default function LoginPage() {
   const cleanEmail = email.trim().toLowerCase();
   const isEmonsEmail = cleanEmail.endsWith("@emons.co.kr");
 
+  const hasAnyProfile = async () => {
+    const { count, error } = await supabase
+      .from("profiles")
+      .select("id", { count: "exact", head: true });
+
+    if (error) throw error;
+    return (count ?? 0) > 0;
+  };
+
   const signUp = async () => {
     if (!name.trim()) return alert("이름을 입력해주세요.");
     if (!position.trim()) return alert("직급을 입력해주세요.");
     if (!department) return alert("담당부서를 선택해주세요.");
     if (!isEmonsEmail) return alert("emons.co.kr 회사 이메일만 가입 가능합니다.");
-    if (!canUseProductFlow(cleanEmail)) return alert(PRODUCT_FLOW_ACCESS_MESSAGE);
     if (password.length < 6) return alert("비밀번호는 6자리 이상 입력해주세요.");
+
+    let isFirstProfile = false;
+    try {
+      isFirstProfile = !(await hasAnyProfile());
+    } catch (error) {
+      alert(`가입 상태 확인 오류: ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
+      return;
+    }
+
+    if (!isFirstProfile && !canUseProductFlow(cleanEmail)) return alert(PRODUCT_FLOW_ACCESS_MESSAGE);
 
     const { data, error } = await supabase.auth.signUp({
       email: cleanEmail,
@@ -39,7 +57,7 @@ export default function LoginPage() {
     }
 
     if (data.user) {
-      const isMaster = cleanEmail === "jhhwang1@emons.co.kr";
+      const isMaster = isFirstProfile || canUseProductFlow(cleanEmail);
 
       const { error: profileError } = await supabase.from("profiles").upsert({
         id: data.user.id,
@@ -57,13 +75,12 @@ export default function LoginPage() {
       }
     }
 
-    alert("회원가입 완료! 관리자 승인 후 로그인 가능합니다.");
+    alert(isFirstProfile ? "마스터 계정 생성 완료! 바로 로그인할 수 있습니다." : "회원가입 완료! 관리자 승인 후 로그인 가능합니다.");
     setMode("login");
   };
 
   const signIn = async () => {
     if (!isEmonsEmail) return alert("emons.co.kr 회사 이메일만 로그인 가능합니다.");
-    if (!canUseProductFlow(cleanEmail)) return alert(PRODUCT_FLOW_ACCESS_MESSAGE);
     if (!password) return alert("비밀번호를 입력해주세요.");
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -98,12 +115,21 @@ export default function LoginPage() {
     }
 
     if (!profile) {
-      if (cleanEmail === "jhhwang1@emons.co.kr") {
+      let isFirstProfile = false;
+      try {
+        isFirstProfile = !(await hasAnyProfile());
+      } catch (error) {
+        alert(`가입 상태 확인 오류: ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
+        await supabase.auth.signOut();
+        return;
+      }
+
+      if (isFirstProfile || canUseProductFlow(cleanEmail)) {
         const { error: createProfileError } = await supabase.from("profiles").upsert({
           id: user.id,
           email: cleanEmail,
-          name: "황지훈",
-          position: "부장",
+          name: cleanEmail,
+          position: "마스터",
           department: "온라인MD",
           role: "admin",
           is_approved: true,
@@ -126,6 +152,12 @@ export default function LoginPage() {
 
     if (!profile.email) {
       await supabase.from("profiles").update({ email: cleanEmail }).eq("id", user.id);
+    }
+
+    if (!canUseProductFlow(cleanEmail, profile)) {
+      alert(PRODUCT_FLOW_ACCESS_MESSAGE);
+      await supabase.auth.signOut();
+      return;
     }
 
     if (!profile.is_approved) {

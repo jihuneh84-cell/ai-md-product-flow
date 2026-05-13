@@ -34,18 +34,18 @@ export default function AdminUsersPage() {
       return;
     }
 
-    if (!canUseProductFlow(user.email)) {
-      await supabase.auth.signOut();
-      alert(PRODUCT_FLOW_ACCESS_MESSAGE);
-      router.push("/login");
-      return;
-    }
-
     const { data: profile } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
       .maybeSingle();
+
+    if (!canUseProductFlow(user.email, profile)) {
+      await supabase.auth.signOut();
+      alert(PRODUCT_FLOW_ACCESS_MESSAGE);
+      router.push("/login");
+      return;
+    }
 
     if (!profile || profile.role !== "admin" || !profile.is_approved) {
       alert("관리자만 접근 가능합니다.");

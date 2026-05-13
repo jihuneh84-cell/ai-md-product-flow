@@ -236,13 +236,6 @@ export default function Home() {
       return;
     }
 
-    if (!canUseProductFlow(user.email)) {
-      await supabase.auth.signOut();
-      alert(PRODUCT_FLOW_ACCESS_MESSAGE);
-      router.push("/login");
-      return;
-    }
-
     const { data: profile, error } = await supabase
       .from("profiles")
       .select("*")
@@ -251,6 +244,13 @@ export default function Home() {
 
     if (error || !profile) {
       await supabase.auth.signOut();
+      router.push("/login");
+      return;
+    }
+
+    if (!canUseProductFlow(user.email, profile)) {
+      await supabase.auth.signOut();
+      alert(PRODUCT_FLOW_ACCESS_MESSAGE);
       router.push("/login");
       return;
     }
