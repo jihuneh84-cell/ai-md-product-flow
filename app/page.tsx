@@ -722,14 +722,17 @@ export default function Home() {
 
   if (!selectedProject) {
     return (
-      <main style={{ fontFamily: UI_FONT }} className="min-h-screen bg-[#f6f3ee] text-[15px] font-semibold text-stone-950 antialiased">
-        <header className="border-b bg-white">
+      <main style={{ fontFamily: UI_FONT }} className="min-h-screen bg-[#f4f7fb] text-[15px] font-semibold text-slate-950 antialiased">
+        <header className="border-b border-[#dfe7f0] bg-white">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-            <div>
-              <h1 className="text-xl font-black">Emons 신제품 출시 업무 포털</h1>
-              <p className="mt-1 text-[15px] font-medium text-stone-700">
-                Supabase DB 기반 프로젝트 협업 관리 시스템
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-[12px] bg-[#1b1688] text-sm font-black text-white">
+                OB
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.08em] text-[#1b1688]">Product Development Flow</p>
+                <h1 className="mt-1 text-xl font-black">Online Business Workspace</h1>
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-3">
@@ -741,7 +744,7 @@ export default function Home() {
               {isAdmin && (
                 <button
                   onClick={() => router.push("/admin/users")}
-                  className="rounded-xl bg-purple-100 px-4 py-2 text-[15px] font-black text-purple-700"
+                  className="rounded-[10px] bg-[#eeefff] px-4 py-2 text-[15px] font-black text-[#1b1688]"
                 >
                   사용자 관리
                 </button>
@@ -750,7 +753,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => router.push("/calendar")}
-                className="rounded-xl bg-blue-100 px-4 py-2 text-[15px] font-black text-blue-700"
+                className="rounded-[10px] bg-[#eef3f8] px-4 py-2 text-[15px] font-black text-slate-700"
               >
                 캘린더
               </button>
@@ -758,7 +761,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => router.push("/dashboard")}
-                className="rounded-xl bg-green-100 px-4 py-2 text-[15px] font-black text-green-700"
+                className="rounded-[10px] bg-[#eef3f8] px-4 py-2 text-[15px] font-black text-slate-700"
               >
                 대시보드
               </button>
@@ -766,7 +769,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => router.push("/product-map")}
-                className="rounded-xl bg-orange-100 px-4 py-2 text-[15px] font-black text-orange-700"
+                className="rounded-[10px] bg-[#eef3f8] px-4 py-2 text-[15px] font-black text-slate-700"
               >
                 포트폴리오
               </button>
@@ -774,12 +777,12 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-xl bg-stone-100 px-4 py-2 text-[15px] font-black text-stone-700"
+                className="rounded-[10px] bg-slate-100 px-4 py-2 text-[15px] font-black text-slate-700"
               >
                 로그아웃
               </button>
 
-              <div className="rounded-xl bg-blue-600 px-4 py-2 text-[15px] font-black text-white">
+              <div className="rounded-[10px] bg-[#1b1688] px-4 py-2 text-[15px] font-black text-white">
                 Supabase Connected
               </div>
             </div>

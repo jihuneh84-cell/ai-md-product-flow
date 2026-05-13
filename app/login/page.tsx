@@ -158,20 +158,28 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-stone-100 px-5">
-      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-xl">
-        <div className="mb-8">
-          <h1 className="text-2xl font-black text-stone-900">Emons 업무 포털</h1>
-          <p className="mt-2 text-sm font-medium text-stone-500">
+    <main className="flex min-h-screen items-center justify-center bg-[#f4f7fb] px-5">
+      <div className="w-full max-w-md rounded-[22px] border border-[#dfe7f0] bg-white p-8 shadow-[0_22px_60px_rgba(20,35,55,0.14)]">
+        <div className="mb-8 text-center">
+          <div className="mx-auto grid h-[72px] w-[72px] place-items-center rounded-[18px] bg-[#1b1688] text-2xl font-black text-white shadow-[0_16px_36px_rgba(27,22,136,0.22)]">
+            OB
+          </div>
+          <p className="mt-7 text-xs font-black uppercase tracking-[0.08em] text-[#1b1688]">
+            Product Development Flow
+          </p>
+          <h1 className="mt-2 text-[28px] font-black leading-tight text-slate-950">
+            Online Business Workspace
+          </h1>
+          <p className="mt-3 text-sm font-bold text-slate-500">
             emons.co.kr 회사 이메일로만 이용 가능합니다.
           </p>
         </div>
 
-        <div className="mb-6 grid grid-cols-2 rounded-2xl bg-stone-100 p-1">
+        <div className="mb-6 grid grid-cols-2 rounded-[14px] bg-[#eef3f8] p-1">
           <button
             onClick={() => setMode("login")}
-            className={`rounded-xl py-3 text-sm font-black ${
-              mode === "login" ? "bg-white text-blue-600 shadow-sm" : "text-stone-500"
+            className={`rounded-[10px] py-3 text-sm font-black ${
+              mode === "login" ? "bg-white text-[#1b1688] shadow-sm" : "text-slate-500"
             }`}
           >
             로그인
@@ -179,8 +187,8 @@ export default function LoginPage() {
 
           <button
             onClick={() => setMode("signup")}
-            className={`rounded-xl py-3 text-sm font-black ${
-              mode === "signup" ? "bg-white text-blue-600 shadow-sm" : "text-stone-500"
+            className={`rounded-[10px] py-3 text-sm font-black ${
+              mode === "signup" ? "bg-white text-[#1b1688] shadow-sm" : "text-slate-500"
             }`}
           >
             회원가입
@@ -194,20 +202,20 @@ export default function LoginPage() {
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder="이름"
-                className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-5 py-4 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white"
+                className="w-full rounded-[14px] border border-[#dfe7f0] bg-[#f8fbff] px-5 py-4 text-sm font-bold outline-none focus:border-[#1b1688] focus:bg-white"
               />
 
               <input
                 value={position}
                 onChange={(event) => setPosition(event.target.value)}
                 placeholder="직급 예: 부장 / 과장 / 대리"
-                className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-5 py-4 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white"
+                className="w-full rounded-[14px] border border-[#dfe7f0] bg-[#f8fbff] px-5 py-4 text-sm font-bold outline-none focus:border-[#1b1688] focus:bg-white"
               />
 
               <select
                 value={department}
                 onChange={(event) => setDepartment(event.target.value)}
-                className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-5 py-4 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white"
+                className="w-full rounded-[14px] border border-[#dfe7f0] bg-[#f8fbff] px-5 py-4 text-sm font-bold outline-none focus:border-[#1b1688] focus:bg-white"
               >
                 {DEPARTMENTS.map((dept) => (
                   <option key={dept} value={dept}>
@@ -222,7 +230,7 @@ export default function LoginPage() {
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="이메일(아이디) 예: name@emons.co.kr"
-            className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-5 py-4 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white"
+            className="w-full rounded-[14px] border border-[#dfe7f0] bg-[#f8fbff] px-5 py-4 text-sm font-bold outline-none focus:border-[#1b1688] focus:bg-white"
           />
 
           {email && !isEmonsEmail && (
@@ -236,7 +244,7 @@ export default function LoginPage() {
             onChange={(event) => setPassword(event.target.value)}
             type="password"
             placeholder="비밀번호"
-            className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-5 py-4 text-sm font-bold outline-none focus:border-blue-500 focus:bg-white"
+            className="w-full rounded-[14px] border border-[#dfe7f0] bg-[#f8fbff] px-5 py-4 text-sm font-bold outline-none focus:border-[#1b1688] focus:bg-white"
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 if (mode === "login") signIn();
@@ -247,7 +255,7 @@ export default function LoginPage() {
 
           <button
             onClick={mode === "login" ? signIn : signUp}
-            className="w-full rounded-2xl bg-blue-600 py-4 text-sm font-black text-white shadow-lg shadow-blue-600/20 active:scale-95"
+            className="w-full rounded-[14px] bg-[#1b1688] py-4 text-sm font-black text-white shadow-[0_16px_34px_rgba(27,22,136,0.22)] active:scale-95"
           >
             {mode === "login" ? "로그인" : "회원가입 요청"}
           </button>
