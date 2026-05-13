@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from "@/lib/access";
 
 type Project = {
   id: string;
@@ -28,6 +29,17 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!canUseProductFlow(user?.email)) {
+      await supabase.auth.signOut();
+      alert(PRODUCT_FLOW_ACCESS_MESSAGE);
+      router.push("/login");
+      return;
+    }
+
     const { data: projectsData } = await supabase
       .from("projects")
       .select("*");

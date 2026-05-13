@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from "@/lib/access";
 
 type Project = {
   id: string;
@@ -184,6 +185,17 @@ export default function CalendarPage() {
 
   const fetchProjects = async () => {
     setLoading(true);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!canUseProductFlow(user?.email)) {
+      await supabase.auth.signOut();
+      alert(PRODUCT_FLOW_ACCESS_MESSAGE);
+      router.push("/login");
+      return;
+    }
 
     const { data, error } = await supabase
       .from("projects")

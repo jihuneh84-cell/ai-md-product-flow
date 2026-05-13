@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from "@/lib/access";
 
 type Profile = {
   id: string;
@@ -29,6 +30,13 @@ export default function AdminUsersPage() {
     } = await supabase.auth.getUser();
 
     if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    if (!canUseProductFlow(user.email)) {
+      await supabase.auth.signOut();
+      alert(PRODUCT_FLOW_ACCESS_MESSAGE);
       router.push("/login");
       return;
     }

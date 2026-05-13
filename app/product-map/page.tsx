@@ -4,6 +4,7 @@ import { ChangeEvent, DragEvent, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as XLSX from 'xlsx'
 import { supabase } from '@/lib/supabaseClient'
+import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from '@/lib/access'
 
 const UI_FONT = 'Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -438,6 +439,17 @@ export default function ProductMapPage() {
   }, [])
 
   const fetchProducts = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!canUseProductFlow(user?.email)) {
+      await supabase.auth.signOut()
+      alert(PRODUCT_FLOW_ACCESS_MESSAGE)
+      router.push('/login')
+      return
+    }
+
     const { data: productData, error: productError } = await supabase
       .from('products')
       .select('*')

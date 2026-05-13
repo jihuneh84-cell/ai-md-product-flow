@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from "@/lib/access";
 
 const DEPARTMENTS = ["온라인MD", "상품개발", "웹디자인", "오퍼레이션"];
 
@@ -24,6 +25,7 @@ export default function LoginPage() {
     if (!position.trim()) return alert("직급을 입력해주세요.");
     if (!department) return alert("담당부서를 선택해주세요.");
     if (!isEmonsEmail) return alert("emons.co.kr 회사 이메일만 가입 가능합니다.");
+    if (!canUseProductFlow(cleanEmail)) return alert(PRODUCT_FLOW_ACCESS_MESSAGE);
     if (password.length < 6) return alert("비밀번호는 6자리 이상 입력해주세요.");
 
     const { data, error } = await supabase.auth.signUp({
@@ -61,6 +63,7 @@ export default function LoginPage() {
 
   const signIn = async () => {
     if (!isEmonsEmail) return alert("emons.co.kr 회사 이메일만 로그인 가능합니다.");
+    if (!canUseProductFlow(cleanEmail)) return alert(PRODUCT_FLOW_ACCESS_MESSAGE);
     if (!password) return alert("비밀번호를 입력해주세요.");
 
     const { error } = await supabase.auth.signInWithPassword({
