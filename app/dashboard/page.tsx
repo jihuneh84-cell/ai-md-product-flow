@@ -41,7 +41,7 @@ export default function DashboardPage() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role, is_approved")
+      .select("role, is_admin, is_approved")
       .eq("id", user.id)
       .maybeSingle();
 

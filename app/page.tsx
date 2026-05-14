@@ -3,7 +3,7 @@
 import { ChangeEvent, DragEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from "@/lib/access";
+import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow, isProductFlowAdmin } from "@/lib/access";
 import WorkspaceNav from "@/components/WorkspaceNav";
 
 type Step = {
@@ -44,7 +44,8 @@ type Profile = {
   name: string | null;
   position: string | null;
   department: string | null;
-  role: "admin" | "user";
+  role: string | null;
+  is_admin?: boolean | null;
   is_approved: boolean;
 };
 
@@ -161,7 +162,8 @@ export default function Home() {
   const [currentUserId, setCurrentUserId] = useState("");
   const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [currentUserName, setCurrentUserName] = useState("");
-  const [currentUserRole, setCurrentUserRole] = useState<"admin" | "user">("user");
+  const [currentUserRole, setCurrentUserRole] = useState<string>("user");
+  const [currentUserIsAdmin, setCurrentUserIsAdmin] = useState(false);
 
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -189,7 +191,7 @@ export default function Home() {
     ? getStepById(selectedProject.current_step_id)
     : BASE_STEPS[0];
 
-  const isAdmin = currentUserRole === "admin";
+  const isAdmin = currentUserIsAdmin || currentUserRole === "admin" || currentUserRole === "관리자";
 
   const getOwnerDisplayName = (ownerValue?: string) => {
     if (!ownerValue) return "담당자 미정";
@@ -267,6 +269,7 @@ export default function Home() {
     setCurrentUserEmail(user.email ?? "");
     setCurrentUserName(profile.name ?? user.email ?? "");
     setCurrentUserRole(profile.role ?? "user");
+    setCurrentUserIsAdmin(isProductFlowAdmin(profile));
     setCheckingAuth(false);
   };
 

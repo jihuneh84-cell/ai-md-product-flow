@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from "@/lib/access";
+import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow, isProductFlowAdmin } from "@/lib/access";
 import WorkspaceNav from "@/components/WorkspaceNav";
 
 type Profile = {
@@ -13,7 +13,8 @@ type Profile = {
   name: string | null;
   position: string | null;
   department: string | null;
-  role: "admin" | "user";
+  role: string | null;
+  is_admin?: boolean | null;
   is_approved: boolean;
   created_at: string;
 };
@@ -48,7 +49,7 @@ export default function AdminUsersPage() {
       return;
     }
 
-    if (!profile || profile.role !== "admin" || !profile.is_approved) {
+    if (!profile || !isProductFlowAdmin(profile) || !profile.is_approved) {
       alert("관리자만 접근 가능합니다.");
       router.push("/");
       return;
@@ -142,7 +143,7 @@ export default function AdminUsersPage() {
 
   const pendingCount = profiles.filter((profile) => !profile.is_approved).length;
   const approvedCount = profiles.filter((profile) => profile.is_approved).length;
-  const adminCount = profiles.filter((profile) => profile.role === "admin").length;
+  const adminCount = profiles.filter((profile) => isProductFlowAdmin(profile)).length;
 
   return (
     <main className="min-h-screen bg-[#f4f7fb] pt-12 text-slate-950">
@@ -264,7 +265,7 @@ export default function AdminUsersPage() {
 
                   <div className="flex items-center">
                     <select
-                      value={profile.role}
+                      value={profile.role ?? "user"}
                       onChange={(event) =>
                         updateRole(profile.id, event.target.value as "admin" | "user")
                       }

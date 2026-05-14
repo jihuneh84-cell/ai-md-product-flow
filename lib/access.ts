@@ -6,12 +6,18 @@ export const normalizeEmail = (email?: string | null) => (email || '').trim().to
 
 type ProductFlowProfile = {
   role?: string | null
+  is_admin?: boolean | null
   is_approved?: boolean | null
+}
+
+export const isProductFlowAdmin = (profile?: ProductFlowProfile | null) => {
+  const role = String(profile?.role || '').trim().toLowerCase()
+  return Boolean(profile?.is_admin || role === 'admin' || role === '관리자')
 }
 
 export const canUseProductFlow = (email?: string | null, profile?: ProductFlowProfile | null) => {
   return (
     PRODUCT_FLOW_ALLOWED_EMAILS.includes(normalizeEmail(email)) ||
-    Boolean(profile?.is_approved && profile.role === 'admin')
+    Boolean(profile?.is_approved && isProductFlowAdmin(profile))
   )
 }
