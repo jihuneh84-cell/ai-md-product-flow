@@ -5,6 +5,16 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from "@/lib/access";
 
+const getConnectionErrorMessage = (error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error || "");
+
+  if (message.toLowerCase().includes("fetch failed") || message.toLowerCase().includes("failed to fetch")) {
+    return "Supabase 연결에 실패했습니다. .env.local의 NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY 값과 네트워크 연결을 확인해주세요.";
+  }
+
+  return message || "알 수 없는 오류가 발생했습니다.";
+};
+
 const DEPARTMENTS = ["온라인MD", "상품개발", "웹디자인", "오퍼레이션"];
 
 export default function LoginPage() {
@@ -73,10 +83,18 @@ export default function LoginPage() {
 
     if (!isFirstProfile && !canUseProductFlow(cleanEmail)) return alert(PRODUCT_FLOW_ACCESS_MESSAGE);
 
-    const { data, error } = await supabase.auth.signUp({
-      email: cleanEmail,
-      password,
-    });
+    let signUpResult;
+    try {
+      signUpResult = await supabase.auth.signUp({
+        email: cleanEmail,
+        password,
+      });
+    } catch (error) {
+      alert(getConnectionErrorMessage(error));
+      return;
+    }
+
+    const { data, error } = signUpResult;
 
     if (error) {
       if (error.message.toLowerCase().includes("already registered")) {
@@ -116,10 +134,18 @@ export default function LoginPage() {
     if (!isEmonsEmail) return alert("emons.co.kr 회사 이메일만 로그인 가능합니다.");
     if (!password) return alert("비밀번호를 입력해주세요.");
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: cleanEmail,
-      password,
-    });
+    let signInResult;
+    try {
+      signInResult = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+    } catch (error) {
+      alert(getConnectionErrorMessage(error));
+      return;
+    }
+
+    const { error } = signInResult;
 
     if (error) {
       alert(error.message);
