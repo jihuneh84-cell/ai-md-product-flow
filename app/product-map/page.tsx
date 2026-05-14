@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import * as XLSX from 'xlsx'
 import { supabase } from '@/lib/supabaseClient'
 import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from '@/lib/access'
+import WorkspaceNav from '@/components/WorkspaceNav'
 
 const UI_FONT = 'Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
 
@@ -852,7 +853,8 @@ export default function ProductMapPage() {
   const noImageCount = products.filter((product) => !getDisplayImage(product)).length
 
   return (
-    <div style={{ fontFamily: UI_FONT }} className="min-h-screen bg-[#f6f3ee] p-6 text-[15px] font-semibold text-stone-950 antialiased">
+    <div style={{ fontFamily: UI_FONT }} className="min-h-screen bg-[#f4f7fb] p-6 pt-20 text-[15px] font-semibold text-slate-950 antialiased">
+      <WorkspaceNav active="portfolio" />
       <div className="mb-4 rounded-3xl border border-stone-300 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

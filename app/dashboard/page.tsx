@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from "@/lib/access";
+import WorkspaceNav from "@/components/WorkspaceNav";
 
 type Project = {
   id: string;
@@ -112,7 +113,8 @@ export default function DashboardPage() {
   });
 
   return (
-    <main className="min-h-screen bg-stone-50 text-stone-900 p-6">
+    <main className="min-h-screen bg-[#f4f7fb] p-6 pt-20 text-slate-950">
+      <WorkspaceNav active="dashboard" />
       <div className="max-w-7xl mx-auto">
 
         <div className="flex justify-between mb-6">

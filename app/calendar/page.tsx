@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from "@/lib/access";
+import WorkspaceNav from "@/components/WorkspaceNav";
 
 type Project = {
   id: string;
@@ -255,7 +256,8 @@ export default function CalendarPage() {
   };
 
   return (
-    <main className="min-h-screen bg-stone-50 text-stone-900">
+    <main className="min-h-screen bg-[#f4f7fb] pt-12 text-slate-950">
+      <WorkspaceNav active="calendar" />
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <div>

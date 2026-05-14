@@ -4,6 +4,7 @@ import { ChangeEvent, DragEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from "@/lib/access";
+import WorkspaceNav from "@/components/WorkspaceNav";
 
 type Step = {
   id: string;
@@ -730,7 +731,8 @@ export default function Home() {
 
   if (!selectedProject) {
     return (
-      <main style={{ fontFamily: UI_FONT }} className="min-h-screen bg-[#f4f7fb] text-[15px] font-semibold text-slate-950 antialiased">
+      <main style={{ fontFamily: UI_FONT }} className="min-h-screen bg-[#f4f7fb] pt-12 text-[15px] font-semibold text-slate-950 antialiased">
+        <WorkspaceNav active="product" userName={currentUserName} onLogout={handleLogout} />
         <header className="border-b border-[#dfe7f0] bg-white">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
             <div className="flex items-center gap-3">
@@ -951,7 +953,8 @@ export default function Home() {
   }
 
   return (
-    <main style={{ fontFamily: UI_FONT }} className="flex min-h-screen flex-col bg-[#f6f3ee] text-[15px] font-semibold text-stone-950 antialiased">
+      <main style={{ fontFamily: UI_FONT }} className="flex min-h-screen flex-col bg-[#f4f7fb] pt-12 text-[15px] font-semibold text-slate-950 antialiased">
+      <WorkspaceNav active="product" userName={currentUserName} onLogout={handleLogout} />
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <div className="flex items-center gap-3">

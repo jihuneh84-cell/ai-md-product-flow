@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from "@/lib/access";
+import WorkspaceNav from "@/components/WorkspaceNav";
 
 type Profile = {
   id: string;
@@ -129,7 +130,8 @@ export default function AdminUsersPage() {
 
   if (checking) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-stone-50">
+      <main className="flex min-h-screen items-center justify-center bg-[#f4f7fb] pt-12">
+        <WorkspaceNav active="admin" />
         <div className="rounded-3xl border bg-white px-8 py-6 text-center shadow-sm">
           <p className="text-lg font-black text-stone-900">관리자 권한 확인 중...</p>
           <p className="mt-2 text-sm font-bold text-stone-400">잠시만 기다려주세요.</p>
@@ -143,7 +145,8 @@ export default function AdminUsersPage() {
   const adminCount = profiles.filter((profile) => profile.role === "admin").length;
 
   return (
-    <main className="min-h-screen bg-stone-50 text-stone-900">
+    <main className="min-h-screen bg-[#f4f7fb] pt-12 text-slate-950">
+      <WorkspaceNav active="admin" />
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <div>
