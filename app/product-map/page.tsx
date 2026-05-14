@@ -61,7 +61,7 @@ const categories: Record<string, string[]> = {
   리빙소품: ['침구류', '러그', '수건', '조명'],
 }
 
-const statusOptions = ['진행중', '출시예정', '단종예정', '기획중']
+const statusOptions = ['진행중', '출시예정', '단종예정', '단종소진', '기획중']
 
 const CARD_WIDTH = 170
 const CARD_HEIGHT = 190
@@ -87,6 +87,7 @@ function normalizeStatus(value: any) {
   const status = String(value || '').trim()
   if (status === '운영중' || status === '운영') return '진행중'
   if (status === '단종') return '단종예정'
+  if (status === '소진' || status === '단종소진') return '단종소진'
   if (status === '출시예정') return '출시예정'
   if (status === '단종예정') return '단종예정'
   if (status === '기획중') return '기획중'
@@ -129,6 +130,8 @@ function getStatusStyle(status: string | null) {
       return { border: 'border-orange-500', label: 'bg-orange-500 text-white', opacity: '' }
     case '단종예정':
       return { border: 'border-gray-500', label: 'bg-gray-500 text-white', opacity: 'opacity-60 grayscale' }
+    case '단종소진':
+      return { border: 'border-red-700', label: 'bg-red-700 text-white', opacity: 'opacity-45 grayscale' }
     default:
       return { border: 'border-stone-300', label: 'bg-blue-600 text-white', opacity: '' }
   }
