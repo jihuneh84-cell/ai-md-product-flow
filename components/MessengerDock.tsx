@@ -34,7 +34,14 @@ type MessengerMessage = {
 
 const MESSENGER_FILE_BUCKET = 'messenger-files'
 const ATTACHMENT_LIFETIME_MS = 24 * 60 * 60 * 1000
-const EMOTICONS = ['확인했습니다', '감사합니다', '처리 중입니다', '완료했습니다']
+const EMOTICONS = [
+  '확인했습니다 😊',
+  '감사합니다 🙏',
+  '처리 중입니다 🔧',
+  '완료했습니다 ✅',
+  '좋아요 🙌',
+  '잠시 확인할게요 👀',
+]
 
 const displayName = (profile?: Profile | null) => profile?.name || profile?.email || '사용자'
 const isAttachmentActive = (attachment?: MessengerAttachment | null) =>
