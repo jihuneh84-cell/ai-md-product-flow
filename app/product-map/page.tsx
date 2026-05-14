@@ -851,6 +851,94 @@ export default function ProductMapPage() {
   }, [filteredProducts, mapSize])
 
   const noImageCount = products.filter((product) => !getDisplayImage(product)).length
+  const viewModes = [
+    { key: 'cards', label: '카드 보기', copy: '상품 정보를 이미지 중심으로 빠르게 확인합니다.' },
+    { key: 'stage', label: '단계별 보기', copy: '진행 단계별로 상품 흐름을 확인합니다.' },
+    { key: 'timeline', label: '출시 일정 보기', copy: '출시 예정월 기준으로 상품을 정리합니다.' },
+  ] as const
+
+  const [viewMode, setViewMode] = useState<(typeof viewModes)[number]['key']>('cards')
+
+  const productsByStage = useMemo(() => {
+    const groups = new Map<string, Product[]>()
+
+    filteredProducts.forEach((product) => {
+      const key = product.status || '상태 미정'
+      groups.set(key, [...(groups.get(key) || []), product])
+    })
+
+    return Array.from(groups.entries()).map(([stage, items]) => ({
+      stage,
+      items: items.sort((a, b) => String(a.launch_target_date || '9999-99-99').localeCompare(String(b.launch_target_date || '9999-99-99'))),
+    }))
+  }, [filteredProducts])
+
+  const productsByLaunchMonth = useMemo(() => {
+    const groups = new Map<string, Product[]>()
+
+    filteredProducts.forEach((product) => {
+      const label = product.launch_target_date
+        ? `${product.launch_target_date.slice(0, 4)}년 ${Number(product.launch_target_date.slice(5, 7))}월`
+        : '출시일 미정'
+      groups.set(label, [...(groups.get(label) || []), product])
+    })
+
+    return Array.from(groups.entries()).map(([month, items]) => ({
+      month,
+      items: items.sort((a, b) => String(a.launch_target_date || '9999-99-99').localeCompare(String(b.launch_target_date || '9999-99-99'))),
+    }))
+  }, [filteredProducts])
+
+  const renderPortfolioCard = (product: Product, compact = false) => {
+    const style = getStatusStyle(product.status)
+    const displayImage = getDisplayImage(product)
+    const displayPrice = getDisplayPrice(product)
+
+    return (
+      <article key={product.id} className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+        <button
+          type="button"
+          onClick={() => displayImage && setPreviewImage({ src: displayImage, title: product.series_name || '상품 이미지' })}
+          className={`block w-full bg-slate-50 ${compact ? 'h-28' : 'h-40'}`}
+          disabled={!displayImage}
+        >
+          {displayImage ? (
+            <img src={displayImage} alt={product.series_name || '상품 이미지'} className="h-full w-full object-contain p-3" />
+          ) : (
+            <span className="flex h-full items-center justify-center text-[13px] font-black text-slate-400">이미지 없음</span>
+          )}
+        </button>
+
+        <div className="space-y-3 p-4">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h3 className="line-clamp-2 text-[17px] font-black leading-snug text-slate-950">{product.series_name || '-'}</h3>
+              <p className="mt-1 text-[12px] font-bold text-slate-500">{product.category || product.space || '-'}</p>
+            </div>
+            <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-black ${style.label}`}>
+              {product.status || '상태 미정'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 text-[12px] font-bold text-slate-500">
+            <div className="rounded-md bg-slate-50 px-3 py-2">
+              <p>TAG</p>
+              <b className="mt-1 block text-[14px] text-slate-950">{displayPrice ? formatPrice(displayPrice) : '미정'}</b>
+            </div>
+            <div className="rounded-md bg-slate-50 px-3 py-2">
+              <p>출시</p>
+              <b className="mt-1 block text-[14px] text-slate-950">{product.launch_target_date || '미정'}</b>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-2 border-t border-slate-100 pt-3 text-[12px] font-bold text-slate-500">
+            <span className="truncate">{product.current_stage || '단계 미정'}</span>
+            <span className="shrink-0">{getSourceLabel(product.source_type)}</span>
+          </div>
+        </div>
+      </article>
+    )
+  }
 
   return (
     <div style={{ fontFamily: UI_FONT }} className="min-h-screen bg-[#f4f7fb] p-6 pt-20 text-[15px] font-semibold text-slate-950 antialiased">
@@ -1150,7 +1238,85 @@ export default function ProductMapPage() {
           </aside>
         )}
 
-        <section className="h-[780px] flex-1 overflow-auto rounded-3xl border border-stone-300 bg-white shadow-sm">
+        <section className="flex-1 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
+            <div>
+              <p className="text-[12px] font-black tracking-[0.18em] text-[#1b1688]">PRODUCT MAP</p>
+              <h2 className="mt-1 text-2xl font-black text-slate-950">상품맵 보기</h2>
+              <p className="mt-1 text-[13px] font-bold text-slate-500">
+                카드, 단계, 출시 일정 기준으로 포트폴리오를 전환해서 확인합니다.
+              </p>
+            </div>
+
+            <div className="flex rounded-lg bg-slate-100 p-1">
+              {viewModes.map((mode) => (
+                <button
+                  key={mode.key}
+                  type="button"
+                  onClick={() => setViewMode(mode.key)}
+                  className={`rounded-md px-4 py-2 text-[13px] font-black transition ${
+                    viewMode === mode.key ? 'bg-[#1b1688] text-white shadow-sm' : 'text-slate-500 hover:text-slate-950'
+                  }`}
+                  title={mode.copy}
+                >
+                  {mode.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="max-h-[780px] overflow-auto bg-[#f7f9fc] p-5">
+            {filteredProducts.length === 0 && (
+              <div className="flex min-h-[360px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-white text-[15px] font-bold text-slate-500">
+                표시할 상품이 없습니다.
+              </div>
+            )}
+
+            {filteredProducts.length > 0 && viewMode === 'cards' && (
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                {filteredProducts
+                  .slice()
+                  .sort((a, b) => String(a.launch_target_date || '9999-99-99').localeCompare(String(b.launch_target_date || '9999-99-99')))
+                  .map((product) => renderPortfolioCard(product))}
+              </div>
+            )}
+
+            {filteredProducts.length > 0 && viewMode === 'stage' && (
+              <div className="grid min-w-[980px] gap-4 lg:grid-cols-4">
+                {productsByStage.map((group) => (
+                  <section key={group.stage} className="rounded-lg border border-slate-200 bg-white">
+                    <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+                      <h3 className="text-[16px] font-black text-slate-950">{group.stage}</h3>
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[12px] font-black text-slate-500">{group.items.length}개</span>
+                    </div>
+                    <div className="grid gap-3 p-3">
+                      {group.items.map((product) => renderPortfolioCard(product, true))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            )}
+
+            {filteredProducts.length > 0 && viewMode === 'timeline' && (
+              <div className="grid gap-4">
+                {productsByLaunchMonth.map((group) => (
+                  <section key={group.month} className="rounded-lg border border-slate-200 bg-white">
+                    <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+                      <h3 className="text-[18px] font-black text-slate-950">{group.month}</h3>
+                      <span className="rounded-full bg-[#ebe9ff] px-3 py-1 text-[12px] font-black text-[#1b1688]">{group.items.length}개</span>
+                    </div>
+                    <div className="grid gap-4 p-4 sm:grid-cols-2 xl:grid-cols-3">
+                      {group.items.map((product) => renderPortfolioCard(product, true))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {false && (
+        <section className="hidden h-[780px] flex-1 overflow-auto rounded-3xl border border-stone-300 bg-white shadow-sm">
           <div
             className="relative"
             style={{
@@ -1251,6 +1417,7 @@ export default function ProductMapPage() {
             })}
           </div>
         </section>
+        )}
       </div>
 
       <section className="rounded-3xl border border-stone-300 bg-white shadow-sm">
