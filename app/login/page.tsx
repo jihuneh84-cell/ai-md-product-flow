@@ -50,6 +50,12 @@ export default function LoginPage() {
     });
 
     if (error) {
+      if (error.message.toLowerCase().includes("already registered")) {
+        alert("이미 가입된 이메일입니다. 회원가입이 아니라 로그인으로 접속해주세요.");
+        setMode("login");
+        return;
+      }
+
       alert(error.message);
       return;
     }
