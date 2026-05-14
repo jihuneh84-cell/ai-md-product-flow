@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PRODUCT_FLOW_ACCESS_MESSAGE, canUseProductFlow } from "@/lib/access";
@@ -19,6 +19,35 @@ export default function LoginPage() {
 
   const cleanEmail = email.trim().toLowerCase();
   const isEmonsEmail = cleanEmail.endsWith("@emons.co.kr");
+
+  useEffect(() => {
+    const acceptWorkspaceSession = async () => {
+      if (!window.location.hash) return;
+
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const accessToken = params.get("access_token");
+      const refreshToken = params.get("refresh_token");
+      const type = params.get("type");
+
+      if (type !== "workspace_handoff" || !accessToken || !refreshToken) return;
+
+      window.history.replaceState(null, "", "/login");
+
+      const { error } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+
+      if (error) {
+        alert(`워크스페이스 로그인 연결 오류: ${error.message}`);
+        return;
+      }
+
+      router.replace("/");
+    };
+
+    acceptWorkspaceSession();
+  }, [router]);
 
   const hasAnyProfile = async () => {
     const { data, error } = await supabase.rpc("has_product_flow_profiles");
