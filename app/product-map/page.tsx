@@ -355,6 +355,18 @@ function getPriceValue(product: Product) {
   return product.tag_price || product.estimated_tag_price || product.price || 0
 }
 
+function getProductUploadKey(product: Pick<Product, 'space' | 'category' | 'series_name' | 'external_code'>) {
+  const externalCode = String(product.external_code || '').trim().toLowerCase()
+  if (externalCode) return `code:${externalCode}`
+
+  return [
+    'name',
+    String(product.space || '').trim().toLowerCase(),
+    String(product.category || '').trim().toLowerCase(),
+    String(product.series_name || '').trim().toLowerCase(),
+  ].join(':')
+}
+
 function getNonOverlappingProducts(products: Product[], mapWidth: number, mapHeight: number): PositionedProduct[] {
   // 카테고리 내 등록 상품의 TAG가를 기준으로 저가 → 고가 순서로 정렬합니다.
   // 1) 기본 5열 그리드로 고정
@@ -661,15 +673,72 @@ export default function ProductMapPage() {
         return
       }
 
-      const { error } = await supabase.from('products').insert(payload)
+      const { data: existingProducts, error: existingError } = await supabase
+        .from('products')
+        .select('id,space,category,series_name,external_code,image_url,planning_image_url')
+        .neq('source_type', 'planning')
 
-      if (error) {
-        setExcelError(`Supabase 업로드 실패: ${error.message}`)
+      if (existingError) {
+        setExcelError(`기존 상품 조회 실패: ${existingError.message}`)
         setExcelUploading(false)
         return
       }
 
-      setExcelMessage(`${payload.length}개 상품 업로드 완료`)
+      const existingMap = new Map(
+        ((existingProducts || []) as Product[]).map((product) => [getProductUploadKey(product), product])
+      )
+
+      const dedupedPayload = Array.from(
+        payload
+          .reduce((map, item) => map.set(getProductUploadKey(item), item), new Map<string, typeof payload[number]>())
+          .values()
+      )
+
+      const insertPayload: typeof payload = []
+      const updatePayload: Array<{ id: string; data: typeof payload[number] }> = []
+
+      dedupedPayload.forEach((item) => {
+        const existing = existingMap.get(getProductUploadKey(item))
+        if (!existing) {
+          insertPayload.push(item)
+          return
+        }
+
+        updatePayload.push({
+          id: existing.id,
+          data: {
+            ...item,
+            image_url: item.image_url || existing.image_url || null,
+          },
+        })
+      })
+
+      if (insertPayload.length > 0) {
+        const { error } = await supabase.from('products').insert(insertPayload)
+
+        if (error) {
+          setExcelError(`신규 상품 업로드 실패: ${error.message}`)
+          setExcelUploading(false)
+          return
+        }
+      }
+
+      if (updatePayload.length > 0) {
+        const results = await Promise.all(
+          updatePayload.map((item) => supabase.from('products').update(item.data).eq('id', item.id))
+        )
+        const updateError = results.find((result) => result.error)?.error
+
+        if (updateError) {
+          setExcelError(`기존 상품 수정 실패: ${updateError.message}`)
+          setExcelUploading(false)
+          return
+        }
+      }
+
+      setExcelMessage(
+        `엑셀 반영 완료: 신규 ${insertPayload.length}개, 수정 ${updatePayload.length}개`
+      )
       await fetchProducts()
     } catch (error: any) {
       setExcelError(`엑셀 처리 실패: ${error.message}`)
@@ -1038,6 +1107,9 @@ export default function ProductMapPage() {
               />
               <div className="font-bold">엑셀 파일을 클릭하거나 여기로 드래그하세요</div>
               <div className="mt-1 text-[13px] text-stone-700">.xlsx / .xls 파일 지원</div>
+              <div className="mt-1 text-[12px] font-bold text-blue-700">
+                같은 사방넷품번은 기존 상품을 수정하고, 없는 품번은 신규 상품으로 추가됩니다.
+              </div>
             </label>
 
             {excelUploading && <div className="mt-2 text-[15px] text-blue-600">엑셀 업로드 처리 중...</div>}
