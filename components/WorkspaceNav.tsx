@@ -1,6 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabaseClient";
+import MessengerDock from "@/components/MessengerDock";
 
 const WORKSPACE_URL = "https://design-workflow-rust.vercel.app/workspace";
 const WEB_DESIGN_URL = "https://design-workflow-rust.vercel.app/dashboard";
@@ -34,8 +35,9 @@ export default function WorkspaceNav({ active = "product", userName, onLogout }:
     window.location.href = "/login";
   };
 
-  return (
-    <nav className="fixed left-0 right-0 top-0 z-50 flex h-12 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur xl:px-6">
+    return (
+      <>
+        <nav className="fixed left-0 right-0 top-0 z-50 flex h-12 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur xl:px-6">
       <a href={WORKSPACE_URL} className="flex min-w-0 items-center gap-2 text-sm font-black text-slate-950">
         <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-[#1b1688] text-xs text-white">
           OB
@@ -82,6 +84,8 @@ export default function WorkspaceNav({ active = "product", userName, onLogout }:
           로그아웃
         </button>
       </div>
-    </nav>
-  );
+        </nav>
+        <MessengerDock />
+      </>
+    );
 }
