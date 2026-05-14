@@ -21,12 +21,10 @@ export default function LoginPage() {
   const isEmonsEmail = cleanEmail.endsWith("@emons.co.kr");
 
   const hasAnyProfile = async () => {
-    const { count, error } = await supabase
-      .from("profiles")
-      .select("id", { count: "exact", head: true });
+    const { data, error } = await supabase.rpc("has_product_flow_profiles");
 
     if (error) throw error;
-    return (count ?? 0) > 0;
+    return Boolean(data);
   };
 
   const signUp = async () => {

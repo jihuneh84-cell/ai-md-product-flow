@@ -11,6 +11,24 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 Do not commit `.env.local`. It contains project-specific Supabase credentials.
 
+## Supabase Setup
+
+Before the first signup, run the initial schema once in Supabase SQL Editor:
+
+```sql
+-- supabase/product-flow-init.sql
+```
+
+Open `supabase/product-flow-init.sql`, copy the full SQL, paste it into Supabase
+SQL Editor, and click Run.
+
+The SQL creates `profiles`, `projects`, `products`, and the required Storage buckets:
+
+- `project-files`
+- `product-images`
+
+After the SQL is applied, the first person who signs up becomes the master admin account automatically.
+
 ## Getting Started
 
 First, run the development server:
