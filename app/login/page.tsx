@@ -48,10 +48,7 @@ export default function LoginPage() {
         refresh_token: refreshToken,
       });
 
-      if (error) {
-        alert(`워크스페이스 로그인 연결 오류: ${error.message}`);
-        return;
-      }
+      if (error) return;
 
       router.replace("/");
     };
